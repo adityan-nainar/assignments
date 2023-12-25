@@ -14,9 +14,7 @@ function isPalindrome(str) {
   }
   alphanum = alphanum.join('');
   let original = alphanum;
-  alphanum = alphanum.split('');
-  alphanum = alphanum.reverse();
-  alphanum = alphanum.join('');
+  alphanum = alphanum.split('').reverse().join('');
   if(original == alphanum){
     ans = true;
   }
