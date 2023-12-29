@@ -11,27 +11,27 @@
     Response: 200 OK with an array of todo items in JSON format.
     Example: GET http://localhost:3000/todos
     
-  2.GET /todos/:id - Retrieve a specific todo item by ID
-    Description: Returns a specific todo item identified by its ID.
+  2.GET /todos/:id - Retrieve a specific todo item by id
+    Description: Returns a specific todo item identified by its id.
     Response: 200 OK with the todo item in JSON format if found, or 404 Not Found if not found.
     Example: GET http://localhost:3000/todos/123
     
   3. POST /todos - Create a new todo item
     Description: Creates a new todo item.
     Request Body: JSON object representing the todo item.
-    Response: 201 Created with the ID of the created todo item in JSON format. eg: {id: 1}
+    Response: 201 Created with the id of the created todo item in JSON format. eg: {id: 1}
     Example: POST http://localhost:3000/todos
     Request Body: { "title": "Buy groceries", "completed": false, description: "I should buy groceries" }
     
-  4. PUT /todos/:id - Update an existing todo item by ID
-    Description: Updates an existing todo item identified by its ID.
+  4. PUT /todos/:id - Update an existing todo item by id
+    Description: Updates an existing todo item identified by its id.
     Request Body: JSON object representing the updated todo item.
     Response: 200 OK if the todo item was found and updated, or 404 Not Found if not found.
     Example: PUT http://localhost:3000/todos/123
     Request Body: { "title": "Buy groceries", "completed": true }
     
-  5. DELETE /todos/:id - Delete a todo item by ID
-    Description: Deletes a todo item identified by its ID.
+  5. DELETE /todos/:id - Delete a todo item by id
+    Description: Deletes a todo item identified by its id.
     Response: 200 OK if the todo item was found and deleted, or 404 Not Found if not found.
     Example: DELETE http://localhost:3000/todos/123
 
@@ -43,7 +43,53 @@
   const bodyParser = require('body-parser');
   
   const app = express();
-  
   app.use(bodyParser.json());
   
+  function generateid(){
+    let id;
+    do{
+        id = Math.round(Math.random()*1000)}
+    while( todoList.some(todo => todo.id === id));
+    return id;
+  }
+
+  const todoList = [];  
+
+  app.get("/todos", (req,res)=>{
+    res.status(200).json(todoList)
+  })
+
+  app.get("/todos/:id", (req,res)=>{
+      const todo = todoList.find(ele=>ele.id === parseInt(req.params.id))
+      if(todo){ res.status(200).json(todo) }
+      else{ res.status(404).send("Not Found")}
+  })
+
+  app.post("/todos", (req,res)=>{
+      const newTodo = {};
+      newTodo.title = req.body.title,
+      newTodo.description = req.body.description,
+      newTodo.completed = "false"
+      newTodo.id  = generateid();
+      todoList.push(newTodo);
+      res.status(201).json(newTodo.id)
+      console.log(todoList);
+  })
+
+  app.put("/todos/:id", (req,res)=>{
+      let todoCurrent = todoList.find(ele=> ele.id === parseInt(req.params.id));
+      todoCurrent.title = req.body.title;
+      todoCurrent.description = req.body.description;
+      if(todoCurrent != null){ res.status(200).send()}
+      else{ res.status(404).send("Not Found")}
+  })
+
+  app.delete("/todos/:id", (req, res)=>{
+    let index = todoList.findIndex(ele => ele.id == parseInt(req.params.id))
+    todoList.splice(index, index+1)
+    if(index != null){res.status(200).send()}
+    else{res.status(404).send("Not Found")} 
+  })
+
+
   module.exports = app;
