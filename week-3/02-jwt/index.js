@@ -1,5 +1,9 @@
 const jwt = require('jsonwebtoken');
 const jwtPassword = 'secret';
+const zod = require("zod")
+
+const schema1 = zod.string().email()
+const schema2 = zod.string().min(6,{ message: "Must be 6 or more characters long" })
 
 
 /**
@@ -14,7 +18,13 @@ const jwtPassword = 'secret';
  *                        the password does not meet the length requirement.
  */
 function signJwt(username, password) {
-    // Your code here
+    const uname = schema1.safeParse(username)
+    const pw = schema2.safeParse(password)
+    if(!uname.success || !pw.success){
+        return null;
+    }
+    const token = jwt.sign({username}, jwtPassword)
+    return token;
 }
 
 /**
@@ -26,8 +36,14 @@ function signJwt(username, password) {
  *                    using the secret key.
  */
 function verifyJwt(token) {
-    // Your code here
-}
+    try{
+        const verified = jwt.verify(token, jwtPassword);
+    } catch {
+        return false;
+    }
+    return true;
+}  
+    
 
 /**
  * Decodes a JWT to reveal its payload without verifying its authenticity.
@@ -37,7 +53,11 @@ function verifyJwt(token) {
  *                         Returns false if the token is not a valid JWT format.
  */
 function decodeJwt(token) {
-    // Your code here
+    const decode = jwt.decode(token);
+    if(decode){
+        return true;
+    }
+    return false;
 }
 
 
